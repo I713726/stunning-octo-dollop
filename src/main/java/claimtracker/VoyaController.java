@@ -9,5 +9,5 @@ public interface VoyaController {
      * @param sessionData The request (created based on posted JSON)
      * @return Appropriate response based on request
      */
-    public VoyaResponse getResponse(VoyaRequest sessionData);
+    public VoyaResponseImpl getResponse(VoyaRequest sessionData);
 }
