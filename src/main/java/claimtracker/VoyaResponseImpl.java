@@ -6,28 +6,37 @@ package claimtracker;
 public class VoyaResponseImpl implements VoyaResponse {
 
     int questionNumber;
-    int userPIN;
+    String claimNumber;
+    int ssn;
+    String dateOfBirth;
     String speech;
     String reprompt;
     boolean shouldSessionEnd;
 
-    public VoyaResponseImpl(int questionNumber, int userPIN, String speech, String reprompt, boolean shouldSessionEnd) {
+    public VoyaResponseImpl(int questionNumber, String claimNumber, int ssn, String dateOfBirth,
+                            String speech, String reprompt, boolean shouldSessionEnd) {
         this.questionNumber = questionNumber;
-        this.userPIN = userPIN;
+        this.claimNumber = claimNumber;
+        this.ssn = ssn;
+        this.dateOfBirth = dateOfBirth;
         this.speech = speech;
         this.reprompt = reprompt;
         this.shouldSessionEnd = shouldSessionEnd;
     }
 
-
     @Override
     public int getQuestionNumber() {
-        return this.questionNumber;
+        return questionNumber;
     }
 
     @Override
-    public int getUserPIN() {
-        return this.userPIN;
+    public String getClaimNumber() {
+        return claimNumber;
+    }
+
+    @Override
+    public int getSSN() {
+        return ssn;
     }
 
     @Override
@@ -44,4 +53,11 @@ public class VoyaResponseImpl implements VoyaResponse {
     public boolean getShouldSessionEnd() {
         return this.shouldSessionEnd;
     }
+
+    @Override
+    public String getDOB() {
+        return dateOfBirth;
+    }
+
+
 }

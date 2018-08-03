@@ -10,27 +10,50 @@ public class AlexaRequestAndResponseBuilder implements VoyaRequestAndResponseBui
     @Override
     public VoyaRequest buildRequest(String jsonData) {
         JSONObject jsonObject = new JSONObject(jsonData);
-        int questionNo;
-        int voyaPIN;
+        int questionNo = 0;
+        String claimNumber = "";
+        int ssn = 0;
+        String dateOfBirth = "";
         VoyaIntentType intentType;
+
+        String locale = jsonObject.getJSONObject("request").getString("locale");
+        VoyaRequestType requestType = this.getRequestType(jsonObject.getJSONObject("request").getString("type"));
+
         try{
             questionNo = jsonObject.getJSONObject("session").getJSONObject("attributes").getInt("questionNo");
         }
         catch(JSONException e) {
             questionNo = 0;
         }
-
         try{
             intentType = this.getIntentType(jsonObject.getJSONObject("request").getJSONObject("intent").getString("name"));
         }
         catch(JSONException e) {
             intentType = null;
         }
+        try {
+            claimNumber = jsonObject.getJSONObject("session").getJSONObject("attributes").getString("claimNumber");
+        }
+        catch(JSONException e) {
+            claimNumber = "";
+        }
+        if(requestType == VoyaRequestType.INTENT_REQUEST) {
+            if(intentType == VoyaIntentType.LETTER) {
+                claimNumber += jsonObject.getJSONObject("request").getJSONObject("intent").getJSONObject("slots").getJSONObject("letter").getString("value");
+            }
+            else if(intentType == VoyaIntentType.NUMBER) {
+                claimNumber += jsonObject.getJSONObject("request").getJSONObject("intent").getJSONObject("slots").getJSONObject("number").getString("value");
+            }
+            else if(intentType == VoyaIntentType.BIRTH_MONTH_DAY) {
+                dateOfBirth = jsonObject.getJSONObject("request").getJSONObject("intent").getJSONObject("slots").getJSONObject("dateOfBirth").getString("value");
+            }
+            else if(intentType == VoyaIntentType.SSN) {
+                ssn = jsonObject.getJSONObject("request").getJSONObject("intent").getJSONObject("slots").getJSONObject("ssn").getInt("value");
+            }
+        }
 
-        VoyaRequestType requestType = this.getRequestType(jsonObject.getJSONObject("request").getString("type"));
-        String locale = jsonObject.getJSONObject("request").getString("locale");
 
-        return new VoyaRequestImpl(questionNo, 0, requestType, locale, intentType);
+        return new VoyaRequestImpl(questionNo, claimNumber, dateOfBirth, ssn, locale, requestType, intentType);
     }
 
     @Override
@@ -49,7 +72,7 @@ public class AlexaRequestAndResponseBuilder implements VoyaRequestAndResponseBui
                 */
         outJson.getJSONObject("response").put("shouldEndSession", response.getShouldSessionEnd());
         outJson.put("sessionAttributes", new JSONObject().put("questionNo", response.getQuestionNumber())
-                .put("voyaPin", response.getUserPIN()));
+                .put("claimNumber", response.getClaimNumber()).put("dateOfBirth", response.getDOB()).put("ssn", response.getSSN()));
         return outJson.toString();
     }
 
@@ -70,16 +93,20 @@ public class AlexaRequestAndResponseBuilder implements VoyaRequestAndResponseBui
         }
     }
 
+
     private VoyaIntentType getIntentType(String intentType) {
         switch(intentType) {
-            case "VoyaClaimNumberIntent":
-                return VoyaIntentType.CLAIM_NUMBER;
-            case "VoyaSSNIntent":
+            case "VoyaClaimNumberLetter":
+                return VoyaIntentType.LETTER;
+            case "VoyaClaimNumberNumber":
+                return VoyaIntentType.NUMBER;
+            case "VoyaSSN":
                 return VoyaIntentType.SSN;
-            case "VoyaDateOfBirthIntent":
+            case "VoyaDateOfBirth":
                 return VoyaIntentType.BIRTH_MONTH_DAY;
             default:
                 throw new IllegalArgumentException("Unrecognized intent type");
         }
     }
+
 }

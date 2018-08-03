@@ -18,9 +18,21 @@ public interface VoyaResponse {
 
     /**
      * Returns the user's PIN.
-     * @return user PIN
+     * @return user claim number
      */
-    int getUserPIN();
+    String getClaimNumber();
+
+    /**
+     * Return the date of birth
+     * @return string DOB
+     */
+    String getDOB();
+
+    /**
+     * Return the date of birth
+     * @return
+     */
+    int getSSN();
 
     /**
      * Returns the speech to be said by the virtual assistant.

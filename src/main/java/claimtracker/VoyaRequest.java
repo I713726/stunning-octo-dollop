@@ -13,10 +13,22 @@ public interface VoyaRequest {
     int getQuestionNo();
 
     /**
-     * returns the user's PIN
-     * @return user PIN
+     * returns the user's claim number as a String (because claim numbers have letters in them too)
+     * @return user claim number
      */
-    int getVoyaPIN();
+     String getClaimNumber();
+
+    /**
+     * return the last 4 of the SSN used for confirmation
+     * @return last 4 of SSN
+     */
+    int getSSN();
+
+    /**
+     * return birth month and day used for confirmation
+     * @return birth month/day
+     */
+    String getDOB();
 
     /**
      * Returns the type of request
