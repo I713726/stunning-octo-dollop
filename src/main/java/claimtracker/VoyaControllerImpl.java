@@ -23,8 +23,7 @@ public class VoyaControllerImpl implements VoyaController {
                         "it's correct";
                 break;
             case INTENT_REQUEST:
-                this.handleIntent(sessionData);
-                break;
+                return this.handleIntent(sessionData);
             case CANCEL_REQUEST:
                 break;
             case STOP_REQUEST:
@@ -47,7 +46,7 @@ public class VoyaControllerImpl implements VoyaController {
         boolean shouldSessionEnd = false;
         switch(sessionData.getIntent()) {
             case NUMBER:
-                speech = "Ok.";// + claimNumber.charAt(claimNumber.length() - 1);
+                speech = "" + claimNumber.charAt(claimNumber.length() - 1);
                 reprompt = "say the next number";
                 if(claimNumber.length() == 11) {
                     questionNumber ++;
@@ -55,7 +54,7 @@ public class VoyaControllerImpl implements VoyaController {
                 }
                 break;
             case LETTER:
-                speech = "Ok."; //claimNumber.charAt(claimNumber.length() - 1) + "";
+                speech = "" + claimNumber.charAt(claimNumber.length() - 1) + "";
 
                 reprompt = "say the next letter";
                 if(claimNumber.length() == 11) {
@@ -67,15 +66,14 @@ public class VoyaControllerImpl implements VoyaController {
                 speech = "OK, now please say your date of birth";
                 break;
             case BIRTH_MONTH_DAY:
-                speech = this.getData();
+                speech = this.getData(claimNumber, ssn, dateOfBirth);
                 shouldSessionEnd = true;
                 break;
         }
         return new VoyaResponseImpl(questionNumber, claimNumber, ssn, dateOfBirth, speech, reprompt, shouldSessionEnd);
     }
 
-    private String getData() {
-        //TODO: Implement with sample data
-        return "here are the data";
+    private String getData(String claimNumber, int ssn, String dateOfBirth) {
+            return "here are the data";
     }
 }
