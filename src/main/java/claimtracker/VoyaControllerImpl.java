@@ -34,7 +34,7 @@ public class VoyaControllerImpl implements VoyaController {
             case SESSION_END_REQUEST:
                 break;
         }
-        return new VoyaResponseImpl(questionNumber, claimNumber, ssn, speech, dateOfBirth, reprompt, shouldSessionEnd);
+        return new VoyaResponseImpl(questionNumber, claimNumber, ssn, dateOfBirth, speech, reprompt, shouldSessionEnd);
     }
 
     private VoyaResponse handleIntent(VoyaRequest sessionData){
@@ -47,7 +47,7 @@ public class VoyaControllerImpl implements VoyaController {
         boolean shouldSessionEnd = false;
         switch(sessionData.getIntent()) {
             case NUMBER:
-                speech = claimNumber.charAt(claimNumber.length() - 1) + "";
+                speech = "Ok.";// + claimNumber.charAt(claimNumber.length() - 1);
                 reprompt = "say the next number";
                 if(claimNumber.length() == 11) {
                     questionNumber ++;
@@ -55,12 +55,14 @@ public class VoyaControllerImpl implements VoyaController {
                 }
                 break;
             case LETTER:
-                speech = claimNumber.charAt(claimNumber.length() - 1) + "";
+                speech = "Ok."; //claimNumber.charAt(claimNumber.length() - 1) + "";
+
                 reprompt = "say the next letter";
                 if(claimNumber.length() == 11) {
                     questionNumber ++;
                     speech = "OK, now please say the last four of your social security number";
                 }
+                break;
             case SSN:
                 speech = "OK, now please say your date of birth";
                 break;
