@@ -37,6 +37,18 @@ public class AlexaRequestAndResponseBuilder implements VoyaRequestAndResponseBui
         catch(JSONException e) {
             claimNumber = "";
         }
+        try {
+            ssn = jsonObject.getJSONObject("session").getJSONObject("attributes").getInt("ssn");
+        }
+        catch (JSONException e) {
+            ssn = 0;
+        }
+        try {
+            dateOfBirth = jsonObject.getJSONObject("session").getJSONObject("attributes").getString("dateOfBirth");
+        }
+        catch (JSONException e) {
+            dateOfBirth = "";
+        }
         if(requestType == VoyaRequestType.INTENT_REQUEST) {
             if(intentType == VoyaIntentType.LETTER) {
                 claimNumber += jsonObject.getJSONObject("request").getJSONObject("intent").getJSONObject("slots").getJSONObject("letter").getString("value");
@@ -104,6 +116,8 @@ public class AlexaRequestAndResponseBuilder implements VoyaRequestAndResponseBui
                 return VoyaIntentType.SSN;
             case "VoyaDateOfBirth":
                 return VoyaIntentType.BIRTH_MONTH_DAY;
+            case "AMAZON.FallbackIntent":
+                return VoyaIntentType.FALLBACK;
             default:
                 throw new IllegalArgumentException("Unrecognized intent type");
         }
