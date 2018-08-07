@@ -43,6 +43,7 @@ public class VoyaControllerImpl implements VoyaController {
                         "and your date of birth";
                 break;
             case SESSION_END_REQUEST:
+                speech = "OK, have a nice day!";
                 break;
         }
         return new VoyaResponseImpl(questionNumber, claimNumber, ssn, dateOfBirth, speech, reprompt, shouldSessionEnd);
@@ -83,6 +84,10 @@ public class VoyaControllerImpl implements VoyaController {
             case BIRTH_MONTH_DAY:
                 speech = this.getData(claimNumber, ssn, dateOfBirth);
                 shouldSessionEnd = true;
+                break;
+            case FIXLETTER:
+                speech = "OK, say the letter again";
+                claimNumber = claimNumber.substring(0, claimNumber.length() - 1);
                 break;
         }
         return new VoyaResponseImpl(questionNumber, claimNumber, ssn, dateOfBirth, speech, reprompt, shouldSessionEnd);

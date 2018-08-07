@@ -118,6 +118,8 @@ public class AlexaRequestAndResponseBuilder implements VoyaRequestAndResponseBui
                 return VoyaIntentType.BIRTH_MONTH_DAY;
             case "AMAZON.FallbackIntent":
                 return VoyaIntentType.FALLBACK;
+            case "VoyaFixLetterIntent":
+                return VoyaIntentType.FIXLETTER;
             default:
                 throw new IllegalArgumentException("Unrecognized intent type");
         }
