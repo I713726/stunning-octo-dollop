@@ -51,7 +51,7 @@ public class AlexaRequestAndResponseBuilder implements VoyaRequestAndResponseBui
         }
         if(requestType == VoyaRequestType.INTENT_REQUEST) {
             if(intentType == VoyaIntentType.LETTER) {
-                claimNumber += jsonObject.getJSONObject("request").getJSONObject("intent").getJSONObject("slots").getJSONObject("letter").getString("value");
+                claimNumber += jsonObject.getJSONObject("request").getJSONObject("intent").getJSONObject("slots").getJSONObject("letter").getString("value").charAt(0);
             }
             else if(intentType == VoyaIntentType.NUMBER) {
                 claimNumber += jsonObject.getJSONObject("request").getJSONObject("intent").getJSONObject("slots").getJSONObject("number").getString("value");
@@ -98,10 +98,8 @@ public class AlexaRequestAndResponseBuilder implements VoyaRequestAndResponseBui
                 return VoyaRequestType.HELP_REQUEST;
             case "SessionEndedRequest":
                 return VoyaRequestType.SESSION_END_REQUEST;
-            case "StopRequest":
-                return VoyaRequestType.STOP_REQUEST;
             default:
-                return VoyaRequestType.CANCEL_REQUEST;
+                return VoyaRequestType.STOP_REQUEST;
         }
     }
 
@@ -120,6 +118,12 @@ public class AlexaRequestAndResponseBuilder implements VoyaRequestAndResponseBui
                 return VoyaIntentType.FALLBACK;
             case "VoyaFixLetterIntent":
                 return VoyaIntentType.FIXLETTER;
+            case "AMAZON.CancelIntent":
+                return VoyaIntentType.CANCEL;
+            case "AMAZON.HelpIntent":
+                return VoyaIntentType.HELP;
+            case "AMAZON.StopIntent":
+                return VoyaIntentType.CANCEL;
             default:
                 throw new IllegalArgumentException("Unrecognized intent type");
         }

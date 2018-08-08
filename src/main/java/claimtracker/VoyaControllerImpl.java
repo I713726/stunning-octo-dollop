@@ -5,7 +5,6 @@ import org.apache.poi.ss.usermodel.*;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.Iterator;
 /**
  * Question number reference ---
  * 0: Claim number
@@ -63,18 +62,35 @@ public class VoyaControllerImpl implements VoyaController {
                 break;
             case NUMBER:
                 speech = "" + claimNumber.charAt(claimNumber.length() - 1);
+                if(questionNumber != 0) {
+                    claimNumber = claimNumber.substring(0, claimNumber.length() - 1);
+                    if(questionNumber == 1) {
+                        speech = "Please say the last 4 of your SSN";
+                    }
+                    else if(questionNumber == 1) {
+                        speech = "Please say your date of birth";
+                    }
+                }
                 reprompt = "say the next number";
-                if(claimNumber.length() == 11) {
-                    questionNumber ++;
+                if (claimNumber.length() == 11) {
+                    questionNumber++;
                     speech = "OK, now please say the last four of your social security number";
                 }
                 break;
             case LETTER:
                 speech = "" + claimNumber.charAt(claimNumber.length() - 1) + "";
-
+                if(questionNumber != 0) {
+                    claimNumber = claimNumber.substring(0, claimNumber.length() - 1);
+                    if(questionNumber == 1) {
+                        speech = "Please say the last 4 of your SSN";
+                    }
+                    else if(questionNumber == 1) {
+                        speech = "Please say your date of birth";
+                    }
+                }
                 reprompt = "say the next letter";
-                if(claimNumber.length() == 11) {
-                    questionNumber ++;
+                if (claimNumber.length() == 11) {
+                    questionNumber++;
                     speech = "OK, now please say the last four of your social security number";
                 }
                 break;
@@ -89,7 +105,16 @@ public class VoyaControllerImpl implements VoyaController {
                 speech = "OK, say the letter again";
                 claimNumber = claimNumber.substring(0, claimNumber.length() - 1);
                 break;
+            case HELP:
+                speech = "In order to track a claim, we need your claim number, the last four of your ssn, " +
+                        "and your date of birth";
+                break;
+            case CANCEL:
+                speech = "OK, have a nice day!";
+                shouldSessionEnd = true;
+                break;
         }
+        System.out.println(claimNumber);
         return new VoyaResponseImpl(questionNumber, claimNumber, ssn, dateOfBirth, speech, reprompt, shouldSessionEnd);
     }
 

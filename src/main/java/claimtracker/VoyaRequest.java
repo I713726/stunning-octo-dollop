@@ -4,10 +4,9 @@ public interface VoyaRequest {
     /**
      * returns the question number, used for tracking where the user is in the flow of interaction.
      * Question Numbers:
-     *    0 - PIN
-     *    1 - Would you like to hear suggestions to help you retire sooner?
-     *    2 - reccomends that you increase savings by 2%, yes/no
-     *    3 - option to save 1% more a year from now
+     * 0 - next digit/letter of claim number
+     * 1 - last 4 digits of SSN
+     * 2 - date of birth (month, day)
      * @return the question number
      */
     int getQuestionNo();
