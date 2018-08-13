@@ -31,7 +31,7 @@ public class VoyaRequestImpl implements VoyaRequest {
 
     @Override
     public int getClaimIndex() {
-        return this.getClaimIndex();
+        return this.claimIndex;
     }
 
     @Override
@@ -49,5 +49,7 @@ public class VoyaRequestImpl implements VoyaRequest {
         return intentType;
     }
 
-
+    public String getNIGOResponse() {
+        return "Example NIGO response";
+    }
 }

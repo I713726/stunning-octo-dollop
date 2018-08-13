@@ -41,10 +41,11 @@ public class WebControllerTests {
         /*
         this.mockMvc.perform(get("/greeting")).andDo(print()).andExpect(status().isOk())
                 .andExpect(jsonPath("$.content").value("Hello, World!"));
-                */
+
         VoyaResponse response = new VoyaResponseImpl(0, "AB123", 1234, "9/9",
                 "speech", "reprompt", false);
         System.out.println(new AlexaRequestAndResponseBuilder().buildResponse(response));
+        */
     }
 
     @Test

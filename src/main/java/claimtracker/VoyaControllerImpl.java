@@ -46,7 +46,7 @@ public class VoyaControllerImpl implements VoyaController {
                 speech = "OK, have a nice day!";
                 break;
         }
-        return new VoyaResponseImpl(questionNumber, voyaPin, claimIndex, dateOfBirth, speech, shouldSessionEnd);
+        return new VoyaResponseImpl(questionNumber, voyaPin, claimIndex, speech, reprompt, shouldSessionEnd);
     }
 
     private VoyaResponse handleIntent(VoyaRequest sessionData){
@@ -95,6 +95,10 @@ public class VoyaControllerImpl implements VoyaController {
                     break;
                 case PIN:
                     VoyaUserDataObject userDataObject = this.getData(userPIN);
+                    speech = "Here are all of the claims that you have submitted. ";
+                    userDataObject = this.getData(userPIN);
+                    speech += userDataObject.listClaims();
+                    break;
                 case CHOOSE_CLAIM:
                     userDataObject = this.getData(userPIN);
                     speech = "description of " + userDataObject.presentClaim(claimIndex);
@@ -156,7 +160,7 @@ public class VoyaControllerImpl implements VoyaController {
 
             @Override
             public String listClaims() {
-                return "here are your claims";
+                return "here are your claims " + presentClaim(0);
             }
 
             @Override
