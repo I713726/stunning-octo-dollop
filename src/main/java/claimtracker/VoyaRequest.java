@@ -12,22 +12,17 @@ public interface VoyaRequest {
     int getQuestionNo();
 
     /**
-     * returns the user's claim number as a String (because claim numbers have letters in them too)
-     * @return user claim number
+     * returns the user's PIN number
+     * @return user PIN number
      */
-     String getClaimNumber();
+     int getUserPIN();
 
     /**
-     * return the last 4 of the SSN used for confirmation
-     * @return last 4 of SSN
+     * Once the user has chosen a claim to review, it will return the index of the claim they chose in their list of claims.
+     * If the user has not chosen yet it will be zero.
+     * @return
      */
-    int getSSN();
-
-    /**
-     * return birth month and day used for confirmation
-     * @return birth month/day
-     */
-    String getDOB();
+    int getClaimIndex();
 
     /**
      * Returns the type of request
@@ -46,4 +41,10 @@ public interface VoyaRequest {
      * @return intent type from enum VoyaIntentType
      */
     VoyaIntentType getIntent();
+
+    /**
+     * gives us the user's answer to any NIGO status the user could fulfill.
+     * @return a string of text that addresses the NIGO event.
+     */
+    String getNIGOResponse();
 }

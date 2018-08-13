@@ -11,9 +11,8 @@ public class AlexaRequestAndResponseBuilder implements VoyaRequestAndResponseBui
     public VoyaRequest buildRequest(String jsonData) {
         JSONObject jsonObject = new JSONObject(jsonData);
         int questionNo = 0;
-        String claimNumber = "";
-        int ssn = 0;
-        String dateOfBirth = "";
+        int userPIN = 0;
+        int claimIndex = 0;
         VoyaIntentType intentType;
 
         String locale = jsonObject.getJSONObject("request").getString("locale");
@@ -32,40 +31,28 @@ public class AlexaRequestAndResponseBuilder implements VoyaRequestAndResponseBui
             intentType = null;
         }
         try {
-            claimNumber = jsonObject.getJSONObject("session").getJSONObject("attributes").getString("claimNumber");
+            userPIN = jsonObject.getJSONObject("session").getJSONObject("attributes").getInt("voyaPIN");
         }
         catch(JSONException e) {
-            claimNumber = "";
+            userPIN = 0;
         }
         try {
-            ssn = jsonObject.getJSONObject("session").getJSONObject("attributes").getInt("ssn");
+            claimIndex = jsonObject.getJSONObject("session").getJSONObject("attributes").getInt("claimIndex");
         }
         catch (JSONException e) {
-            ssn = 0;
-        }
-        try {
-            dateOfBirth = jsonObject.getJSONObject("session").getJSONObject("attributes").getString("dateOfBirth");
-        }
-        catch (JSONException e) {
-            dateOfBirth = "";
+            claimIndex = 0;
         }
         if(requestType == VoyaRequestType.INTENT_REQUEST) {
-            if(intentType == VoyaIntentType.LETTER) {
-                claimNumber += jsonObject.getJSONObject("request").getJSONObject("intent").getJSONObject("slots").getJSONObject("letter").getString("value").charAt(0);
+            if(intentType == VoyaIntentType.PIN) {
+                userPIN = jsonObject.getJSONObject("request").getJSONObject("intent").getJSONObject("slots").getJSONObject("voyaPIN").getInt("value");
             }
-            else if(intentType == VoyaIntentType.NUMBER) {
-                claimNumber += jsonObject.getJSONObject("request").getJSONObject("intent").getJSONObject("slots").getJSONObject("number").getString("value");
-            }
-            else if(intentType == VoyaIntentType.BIRTH_MONTH_DAY) {
-                dateOfBirth = jsonObject.getJSONObject("request").getJSONObject("intent").getJSONObject("slots").getJSONObject("dateOfBirth").getString("value");
-            }
-            else if(intentType == VoyaIntentType.SSN) {
-                ssn = jsonObject.getJSONObject("request").getJSONObject("intent").getJSONObject("slots").getJSONObject("ssn").getInt("value");
+            else if(intentType == VoyaIntentType.CHOOSE_CLAIM) {
+                //TODO: Handle the choosing of a claim in whatever way seems to make sense
             }
         }
 
 
-        return new VoyaRequestImpl(questionNo, claimNumber, dateOfBirth, ssn, locale, requestType, intentType);
+        return new VoyaRequestImpl(questionNo, userPIN, claimIndex, locale, requestType, intentType);
     }
 
     @Override
@@ -84,7 +71,7 @@ public class AlexaRequestAndResponseBuilder implements VoyaRequestAndResponseBui
                 */
         outJson.getJSONObject("response").put("shouldEndSession", response.getShouldSessionEnd());
         outJson.put("sessionAttributes", new JSONObject().put("questionNo", response.getQuestionNumber())
-                .put("claimNumber", response.getClaimNumber()).put("dateOfBirth", response.getDOB()).put("ssn", response.getSSN()));
+                .put("voyaPIN", response.getUserPIN()).put("claimIndex", response.getClaimIndex()));
         return outJson.toString();
     }
 
@@ -106,18 +93,18 @@ public class AlexaRequestAndResponseBuilder implements VoyaRequestAndResponseBui
 
     private VoyaIntentType getIntentType(String intentType) {
         switch(intentType) {
-            case "VoyaClaimNumberLetter":
-                return VoyaIntentType.LETTER;
-            case "VoyaClaimNumberNumber":
-                return VoyaIntentType.NUMBER;
-            case "VoyaSSN":
-                return VoyaIntentType.SSN;
-            case "VoyaDateOfBirth":
-                return VoyaIntentType.BIRTH_MONTH_DAY;
+            case "VoyaChooseClaimIntent":
+                return VoyaIntentType.CHOOSE_CLAIM;
+            case "VoyaYesIntent":
+                return VoyaIntentType.YES;
+            case "VoyaNoIntent":
+                return VoyaIntentType.NO;
+            case "VoyaNIGOResponse":
+                return VoyaIntentType.NIGO_RESPONSE;
             case "AMAZON.FallbackIntent":
                 return VoyaIntentType.FALLBACK;
-            case "VoyaFixLetterIntent":
-                return VoyaIntentType.FIXLETTER;
+            case "VoyaPINIntent":
+                return VoyaIntentType.PIN;
             case "AMAZON.CancelIntent":
                 return VoyaIntentType.CANCEL;
             case "AMAZON.HelpIntent":

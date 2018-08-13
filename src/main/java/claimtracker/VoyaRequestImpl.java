@@ -3,20 +3,18 @@ package claimtracker;
 public class VoyaRequestImpl implements VoyaRequest {
 
     int questionNo;
-    String claimNumber;
+    int userPIN;
+    int claimIndex;
     VoyaRequestType requestType;
     String locale;
-    int ssn;
-    String dateOfBirth;
     VoyaIntentType intentType;
 
-    public VoyaRequestImpl(int questionNo, String claimNumber, String dateOfBirth, int ssn, String locale,
+    public VoyaRequestImpl(int questionNo, int userPIN, int claimIndex, String locale,
                            VoyaRequestType requestType, VoyaIntentType intentType){
         this.questionNo = questionNo;
         this.requestType = requestType;
-        this.dateOfBirth = dateOfBirth;
-        this.ssn = ssn;
-        this.claimNumber = claimNumber;
+        this.userPIN = userPIN;
+        this.claimIndex = claimIndex;
         this.locale = locale;
         this.intentType = intentType;
     }
@@ -27,18 +25,13 @@ public class VoyaRequestImpl implements VoyaRequest {
     }
 
     @Override
-    public String getClaimNumber() {
-        return claimNumber;
+    public int getUserPIN() {
+        return this.userPIN;
     }
 
     @Override
-    public int getSSN() {
-        return ssn;
-    }
-
-    @Override
-    public String getDOB() {
-        return dateOfBirth;
+    public int getClaimIndex() {
+        return this.getClaimIndex();
     }
 
     @Override
@@ -55,4 +48,6 @@ public class VoyaRequestImpl implements VoyaRequest {
     public VoyaIntentType getIntent() {
         return intentType;
     }
+
+
 }

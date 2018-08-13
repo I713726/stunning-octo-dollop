@@ -1,5 +1,5 @@
 package claimtracker;
 
 public enum VoyaIntentType {
-    LETTER, NUMBER, SSN, BIRTH_MONTH_DAY, FIXLETTER, FALLBACK, CANCEL, HELP
+    CHOOSE_CLAIM, YES, NO, NIGO_RESPONSE, PIN, FALLBACK, CANCEL, HELP
 }

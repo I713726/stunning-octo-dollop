@@ -6,19 +6,17 @@ package claimtracker;
 public class VoyaResponseImpl implements VoyaResponse {
 
     int questionNumber;
-    String claimNumber;
-    int ssn;
-    String dateOfBirth;
+    int claimIndex;
+    int userPIN;
     String speech;
     String reprompt;
     boolean shouldSessionEnd;
 
-    public VoyaResponseImpl(int questionNumber, String claimNumber, int ssn, String dateOfBirth,
+    public VoyaResponseImpl(int questionNumber, int userPIN, int claimIndex,
                             String speech, String reprompt, boolean shouldSessionEnd) {
         this.questionNumber = questionNumber;
-        this.claimNumber = claimNumber;
-        this.ssn = ssn;
-        this.dateOfBirth = dateOfBirth;
+        this.claimIndex = claimIndex;
+        this.userPIN = userPIN;
         this.speech = speech;
         this.reprompt = reprompt;
         this.shouldSessionEnd = shouldSessionEnd;
@@ -30,13 +28,13 @@ public class VoyaResponseImpl implements VoyaResponse {
     }
 
     @Override
-    public String getClaimNumber() {
-        return claimNumber;
+    public int getUserPIN() {
+        return this.userPIN;
     }
 
     @Override
-    public int getSSN() {
-        return ssn;
+    public int getClaimIndex() {
+        return this.claimIndex;
     }
 
     @Override
@@ -54,10 +52,6 @@ public class VoyaResponseImpl implements VoyaResponse {
         return this.shouldSessionEnd;
     }
 
-    @Override
-    public String getDOB() {
-        return dateOfBirth;
-    }
 
 
 }

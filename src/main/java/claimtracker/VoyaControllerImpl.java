@@ -7,9 +7,10 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 /**
  * Question number reference ---
- * 0: Claim number
- * 1: SSN
- * 2: DOB
+ * 0: PIN number
+ * 1: Which claim?
+ * 2: would you like to address NIGO items?
+ * 3: respond to next NIGO item
  */
 public class VoyaControllerImpl implements VoyaController {
     @Override
@@ -17,15 +18,15 @@ public class VoyaControllerImpl implements VoyaController {
         String speech = "";
         String reprompt = "";
         int questionNumber = sessionData.getQuestionNo();
-        String claimNumber = "";
-        int ssn = 0;
+        int claimIndex = 0;
+        int voyaPin = 0;
         String dateOfBirth = "";
         boolean shouldSessionEnd = false;
 
         switch (sessionData.getRequestType()) {
             case LAUNCH_REQUEST:
-                speech = "OK, Please say your claim number one letter at a time, I will confirm each letter to make sure" +
-                        "it's correct";
+                speech = "Hi, Welcome to Voya E.B. Claims tracker service. To get started, please say the 4 digit pin" +
+                        "you set up when enabling the skill";
                 break;
             case INTENT_REQUEST:
                 return this.handleIntent(sessionData);
@@ -45,80 +46,79 @@ public class VoyaControllerImpl implements VoyaController {
                 speech = "OK, have a nice day!";
                 break;
         }
-        return new VoyaResponseImpl(questionNumber, claimNumber, ssn, dateOfBirth, speech, reprompt, shouldSessionEnd);
+        return new VoyaResponseImpl(questionNumber, voyaPin, claimIndex, dateOfBirth, speech, shouldSessionEnd);
     }
 
     private VoyaResponse handleIntent(VoyaRequest sessionData){
         String speech = "";
         String reprompt = "";
         int questionNumber = sessionData.getQuestionNo();
-        String claimNumber = sessionData.getClaimNumber();
-        int ssn = sessionData.getSSN();
-        String dateOfBirth = sessionData.getDOB();
+        int claimIndex = sessionData.getClaimIndex();
+        int userPIN = sessionData.getUserPIN();
         boolean shouldSessionEnd = false;
-        switch(sessionData.getIntent()) {
-            case FALLBACK:
-                speech = "I'm sorry?";
-                break;
-            case NUMBER:
-                speech = "" + claimNumber.charAt(claimNumber.length() - 1);
-                if(questionNumber != 0) {
-                    claimNumber = claimNumber.substring(0, claimNumber.length() - 1);
-                    if(questionNumber == 1) {
-                        speech = "Please say the last 4 of your SSN";
-                    }
-                    else if(questionNumber == 1) {
-                        speech = "Please say your date of birth";
-                    }
-                }
-                reprompt = "say the next number";
-                if (claimNumber.length() == 11) {
-                    questionNumber++;
-                    speech = "OK, now please say the last four of your social security number";
-                }
-                break;
-            case LETTER:
-                speech = "" + claimNumber.charAt(claimNumber.length() - 1) + "";
-                if(questionNumber != 0) {
-                    claimNumber = claimNumber.substring(0, claimNumber.length() - 1);
-                    if(questionNumber == 1) {
-                        speech = "Please say the last 4 of your SSN";
-                    }
-                    else if(questionNumber == 1) {
-                        speech = "Please say your date of birth";
-                    }
-                }
-                reprompt = "say the next letter";
-                if (claimNumber.length() == 11) {
-                    questionNumber++;
-                    speech = "OK, now please say the last four of your social security number";
-                }
-                break;
-            case SSN:
-                speech = "OK, now please say your date of birth";
-                break;
-            case BIRTH_MONTH_DAY:
-                speech = this.getData(claimNumber, ssn, dateOfBirth);
+        if(userPIN == 0) {
+            if(sessionData.getIntent() == VoyaIntentType.NO) {
+                speech = "OK, have a nice day.";
                 shouldSessionEnd = true;
-                break;
-            case FIXLETTER:
-                speech = "OK, say the letter again";
-                claimNumber = claimNumber.substring(0, claimNumber.length() - 1);
-                break;
-            case HELP:
-                speech = "In order to track a claim, we need your claim number, the last four of your ssn, " +
-                        "and your date of birth";
-                break;
-            case CANCEL:
-                speech = "OK, have a nice day!";
-                shouldSessionEnd = true;
-                break;
+            }
+            else {
+                speech = "OK, please say your PIN number";
+                shouldSessionEnd = false;
+            }
         }
-        System.out.println(claimNumber);
-        return new VoyaResponseImpl(questionNumber, claimNumber, ssn, dateOfBirth, speech, reprompt, shouldSessionEnd);
+        else {
+            switch (sessionData.getIntent()) {
+
+                case FALLBACK:
+                    speech = "I'm sorry?";
+                    break;
+                case NO:
+                    speech = "OK, have a nice day";
+                    shouldSessionEnd = true;
+                    break;
+                case YES:
+                    switch (questionNumber) {
+                        case 0:
+                            speech = "OK, go ahead and say your PIN";
+                            shouldSessionEnd = false;
+                            break;
+                        case 1:
+                            speech = "OK, you can pick one of the claims";
+                            shouldSessionEnd = false;
+                            break;
+                        case 2:
+                            speech = "OK, here's the first item. " + this.getData(userPIN).getNextNIGOEvent(claimIndex);
+                            break;
+                        case 3:
+                            break;
+                    }
+                    break;
+                case PIN:
+                    VoyaUserDataObject userDataObject = this.getData(userPIN);
+                case CHOOSE_CLAIM:
+                    userDataObject = this.getData(userPIN);
+                    speech = "description of " + userDataObject.presentClaim(claimIndex);
+                    break;
+                case NIGO_RESPONSE:
+                    userDataObject = this.getData(userPIN);
+                    this.submitNIGOResponse(sessionData.getNIGOResponse());
+                    speech = "OK, thanks for your response.";
+                    break;
+                case HELP:
+                    speech = "Help message";
+                    break;
+                case CANCEL:
+                    speech = "OK, have a nice day!";
+                    shouldSessionEnd = true;
+                    break;
+            }
+        }
+        return new VoyaResponseImpl(questionNumber, userPIN, claimIndex, speech, reprompt, shouldSessionEnd);
     }
 
-    private String getData(String claimNumber, int ssn, String dateOfBirth) {
+    private VoyaUserDataObject getData(int userPin) {
+
+        /*
             String xlFilePath = "data.xlsx";
             try {
                 Workbook workbook = WorkbookFactory.create(new File(xlFilePath));
@@ -150,5 +150,43 @@ public class VoyaControllerImpl implements VoyaController {
             }
 
         return "I'm sorry, we could not identify a claim based on the information you provided.";
+        */
+
+        return new VoyaUserDataObject() {
+
+            @Override
+            public String listClaims() {
+                return "here are your claims";
+            }
+
+            @Override
+            public String presentClaim(int index) {
+                return "here is a claim";
+            }
+
+            @Override
+            public String getFirstName() {
+                return "John";
+            }
+
+            @Override
+            public String getLastName() {
+                return "Smith";
+            }
+
+            @Override
+            public String getNextNIGOEvent(int claimIndex) {
+                return "here is the next event";
+            }
+
+            @Override
+            public void respondToCurrentNIGOEvent(int claimIndex) {
+
+            }
+        };
+    }
+
+    private void submitNIGOResponse(String nigoResponse) {
+        //here we submit the response however that has to be done.
     }
 }
