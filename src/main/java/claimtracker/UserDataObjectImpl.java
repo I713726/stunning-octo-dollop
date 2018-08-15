@@ -1,23 +1,24 @@
 package claimtracker;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class UserDataObjectImpl implements VoyaUserDataObject {
 
-    List<VoyaClaim> claims;
+    private List<VoyaClaim> claims;
 
-    @Override
-    public String listClaims() {
-        StringBuilder sb = new StringBuilder();
-        for(VoyaClaim s: claims) {
-            sb.append(s.getText() + "\n");
-        }
-        return sb.toString();
+    public UserDataObjectImpl() {
+        this.claims = new ArrayList<VoyaClaim>();
     }
 
     @Override
-    public String presentClaim(int index) throws IndexOutOfBoundsException {
-        return claims.get(index).getText();
+    public List<VoyaClaim> getClaims() {
+        return new ArrayList<>(this.claims);
+    }
+
+    @Override
+    public VoyaClaim getClaim(int index) throws IndexOutOfBoundsException {
+        return claims.get(index);
     }
 
     @Override
@@ -31,13 +32,27 @@ public class UserDataObjectImpl implements VoyaUserDataObject {
     }
 
     @Override
-    public String getNextNIGOEvent(int claimIndex) {
+    public VoyaNIGOEvent getNextNIGOEvent(int claimIndex) {
         //TODO: Still figuring out how to handle this
         return claims.get(claimIndex).getNextNIGOEvent();
     }
 
     @Override
-    public void respondToCurrentNIGOEvent(int claimIndex) {
+    public VoyaNIGOEvent peekNextNIGOEvent(int claimIndex) {
+        return claims.get(claimIndex).peekNextNIGOEvent();
+    }
+
+    @Override
+    public List<VoyaNIGOEvent> getNIGOEvents(int claimIndex) {
+        return claims.get(claimIndex).getNigoEvents();
+    }
+
+    @Override
+    public void respondToCurrentNIGOEvent(int claimIndex, String response) {
         //Not sure how this is gonna work yet
+    }
+
+    public void addClaim(VoyaClaim claim) {
+        this.claims.add(claim);
     }
 }

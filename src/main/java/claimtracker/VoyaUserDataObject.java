@@ -1,16 +1,24 @@
 package claimtracker;
 
+import java.util.List;
+
 public interface VoyaUserDataObject {
 
-    String listClaims();
+    List<VoyaClaim> getClaims();
 
-    String presentClaim(int index);
+    VoyaClaim getClaim(int index);
 
     String getFirstName();
 
     String getLastName();
 
-    String getNextNIGOEvent(int claimIndex);
+    VoyaNIGOEvent getNextNIGOEvent(int claimIndex);
 
-    void respondToCurrentNIGOEvent(int claimIndex);
+    VoyaNIGOEvent peekNextNIGOEvent(int claimIndex);
+
+    List<VoyaNIGOEvent> getNIGOEvents(int claimIndex);
+
+    void respondToCurrentNIGOEvent(int claimIndex, String response);
+
+    void addClaim(VoyaClaim claim);
 }

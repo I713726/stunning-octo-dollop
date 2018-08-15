@@ -1,15 +1,20 @@
 package claimtracker;
 
+/*
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.*;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+*/
+
+import java.util.List;
+
 /**
  * Question number reference ---
  * 0: PIN number
  * 1: Which claim?
- * 2: would you like to address NIGO items?
+ * 2: would you like to address NIGO item?
  * 3: respond to next NIGO item
  */
 public class VoyaControllerImpl implements VoyaController {
@@ -73,8 +78,39 @@ public class VoyaControllerImpl implements VoyaController {
                     speech = "I'm sorry?";
                     break;
                 case NO:
-                    speech = "OK, have a nice day";
-                    shouldSessionEnd = true;
+                    switch(questionNumber) {
+                        case 0:
+                            speech = "OK, have a nice day";
+                            shouldSessionEnd = true;
+                            break;
+                        case 1:
+                            speech = "OK, have a nice day";
+                            shouldSessionEnd = true;
+                            break;
+                        case 2:
+                            VoyaNIGOEvent event = this.getData(userPIN).getNextNIGOEvent(claimIndex);
+                            speech = "OK, here's the next item. " + event.getText();
+                            if(event.getFixable()) {
+                                speech += ". Would you like to respond to this item now?";
+                            }
+                            else {
+                                speech += ". " + event.getSteps();
+                            }
+                            questionNumber = 3;
+                            shouldSessionEnd = false;
+                            break;
+                        case 3:
+                            event = this.getData(userPIN).getNextNIGOEvent(claimIndex);
+                            speech = "OK, here's the next item. " + event.getText();
+                            if(event.getFixable()) {
+                                speech += ". Would you like to respond to this item now?";
+                            }
+                            else {
+                                speech += ". " + event.getSteps();
+                            }
+                            questionNumber = 3;
+                            break;
+                    }
                     break;
                 case YES:
                     switch (questionNumber) {
@@ -87,21 +123,74 @@ public class VoyaControllerImpl implements VoyaController {
                             shouldSessionEnd = false;
                             break;
                         case 2:
-                            speech = "OK, here's the first item. " + this.getData(userPIN).getNextNIGOEvent(claimIndex);
+                            VoyaNIGOEvent event = this.getData(userPIN).getNextNIGOEvent(claimIndex);
+                            speech = "OK, here's the next item. " + event.getText();
+                            if(event.getFixable()) {
+                                speech += ". Would you like to respond to this item now?";
+                            }
+                            else {
+                                speech += ". " + event.getSteps();
+                            }
+                            questionNumber = 3;
+                            shouldSessionEnd = false;
                             break;
                         case 3:
+                            event = this.getData(userPIN).peekNextNIGOEvent(claimIndex);
+                            speech = "OK, " + event.getSteps();
                             break;
                     }
                     break;
                 case PIN:
                     VoyaUserDataObject userDataObject = this.getData(userPIN);
-                    speech = "Here are all of the claims that you have submitted. ";
-                    userDataObject = this.getData(userPIN);
-                    speech += userDataObject.listClaims();
+                    speech = "Here are all of the claims that you have submitted. You have: ";
+                    List<VoyaClaim> claimList = userDataObject.getClaims();
+                    if(claimList.size() == 0) {
+                        speech += "No claims.";
+                    }
+                    else {
+                        String claimType = "";
+                        String claimState = "";
+                        int count = 1;
+                        for(VoyaClaim claim: claimList) {
+                            switch(claim.getClaimType()) {
+                                case ACCIDENT:
+                                    claimType = "accident";
+                                    break;
+                                case WELLNESS:
+                                    claimType = "wellness";
+                                    break;
+                            }
+                            switch(claim.getState()) {
+                                case PAID:
+                                    claimState = "paid";
+                                    break;
+                                case APPROVED:
+                                    claimState = "approved";
+                                    break;
+                                case DENIED:
+                                    claimState = "denied";
+                                    break;
+                                case RECIEVED:
+                                    claimState = "recieved";
+                                    break;
+                            }
+                            speech += String.format("Claim %d %s claim has been %s.\n", count, claimType, claimState);
+                            count ++;
+                        }
+                    }
+                    speech += "Which claim do you want to get status on?";
+                    questionNumber = 1;
                     break;
                 case CHOOSE_CLAIM:
                     userDataObject = this.getData(userPIN);
-                    speech = "description of " + userDataObject.presentClaim(claimIndex);
+                    VoyaClaim claim = userDataObject.getClaim(claimIndex);
+                    speech += claim.getText();
+                    if (claim.getNumNIGOEvents() > 0) {
+                        speech +=
+                                String.format("\n There are %d issues with this claim, %d of which can be resolved now. " +
+                                        "Would you like to hear them?", claim.getNumNIGOEvents(), claim.getNumFixableNIGOEvents());
+                    }
+                    questionNumber = 2;
                     break;
                 case NIGO_RESPONSE:
                     userDataObject = this.getData(userPIN);
@@ -155,39 +244,22 @@ public class VoyaControllerImpl implements VoyaController {
 
         return "I'm sorry, we could not identify a claim based on the information you provided.";
         */
+        VoyaClaim claim1 = new VoyaClaim("We recieved this claim by mail on 08/03/2018. We are currently  reviewing" +
+                " your claim. This step should be completed no later than 8/17/2018", VoyaClaimType.ACCIDENT, VoyaClaimState.RECIEVED);
+        VoyaClaim claim2 = new VoyaClaim("Your accident claim for $10,000 has been approved. Payment will be sent by" +
+                " check within 24-48 hours", VoyaClaimType.ACCIDENT, VoyaClaimState.APPROVED);
+        VoyaClaim claim3 = new VoyaClaim("Your accident claim has been paid. The payment amount of $10,000 has" +
+                " been sent by check on 08/13/2018. Please allow 7-10 business days for mailing time.", VoyaClaimType.ACCIDENT, VoyaClaimState.PAID);
 
-        return new VoyaUserDataObject() {
+        claim1.addNIGOEvent(new VoyaNIGOEvent(true, NIGO_Fulfillment_Type.DATE,"There was a date missing", "Provide the date"));
+        claim1.addNIGOEvent(new VoyaNIGOEvent(false, null, "need a document", "Please submit the thing the way you're supposed to"));
+        claim1.addNIGOEvent(new VoyaNIGOEvent(true, NIGO_Fulfillment_Type.ADDRESS, "We need an address", "Provide the address"));
+        UserDataObjectImpl retObj = new UserDataObjectImpl();
+        retObj.addClaim(claim1);
+        retObj.addClaim(claim2);
+        retObj.addClaim(claim3);
 
-            @Override
-            public String listClaims() {
-                return "here are your claims " + presentClaim(0);
-            }
-
-            @Override
-            public String presentClaim(int index) {
-                return "here is a claim";
-            }
-
-            @Override
-            public String getFirstName() {
-                return "John";
-            }
-
-            @Override
-            public String getLastName() {
-                return "Smith";
-            }
-
-            @Override
-            public String getNextNIGOEvent(int claimIndex) {
-                return "here is the next event";
-            }
-
-            @Override
-            public void respondToCurrentNIGOEvent(int claimIndex) {
-
-            }
-        };
+        return retObj;
     }
 
     private void submitNIGOResponse(String nigoResponse) {

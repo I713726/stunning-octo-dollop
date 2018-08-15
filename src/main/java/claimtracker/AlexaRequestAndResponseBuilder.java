@@ -45,7 +45,19 @@ public class AlexaRequestAndResponseBuilder implements VoyaRequestAndResponseBui
             claimIndex = jsonObject.getJSONObject("session").getJSONObject("attributes").getInt("claimIndex");
         }
         catch (JSONException e) {
-            claimIndex = 0;
+            if(intentType == VoyaIntentType.CHOOSE_CLAIM){
+                try {
+                    claimIndex = jsonObject.getJSONObject("request").getJSONObject("intent").getJSONObject("slots")
+                            .getJSONObject("claimIndex").getJSONObject("resolutions").getJSONArray("resolutionsPerAuthority")
+                            .getJSONObject(0).getJSONArray("values").getJSONObject(0).getJSONObject("value").getInt("name");
+                } catch (JSONException e1) {
+                    claimIndex = 0;
+                }
+            }
+            else {
+                claimIndex = 0;
+            }
+
         }
         if(requestType == VoyaRequestType.INTENT_REQUEST) {
             if(intentType == VoyaIntentType.PIN) {
@@ -57,7 +69,7 @@ public class AlexaRequestAndResponseBuilder implements VoyaRequestAndResponseBui
         }
 
 
-        return new VoyaRequestImpl(questionNo, userPIN, claimIndex, locale, requestType, intentType);
+        return new VoyaRequestImpl(questionNo, userPIN, claimIndex, locale, requestType, intentType, "");
     }
 
     @Override

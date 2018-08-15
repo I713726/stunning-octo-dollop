@@ -4,25 +4,25 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class VoyaClaim {
-    String text;
-    List<VoyaNIGOEvent> nigoEvents;
-    int nigoCounter;
+    private String text;
+    private List<VoyaNIGOEvent> nigoEvents;
+    private int nigoCounter;
+    private VoyaClaimType claimType;
+    private VoyaClaimState state;
 
-    public VoyaClaim(String text) {
+    public VoyaClaim(String text, VoyaClaimType type, VoyaClaimState state) {
         this.text = text;
         this.nigoEvents = new ArrayList<VoyaNIGOEvent>();
         nigoCounter = 0;
+        this.claimType = type;
+        this.state = state;
     }
     public void addNIGOEvent(VoyaNIGOEvent e) {
         this.nigoEvents.add(e);
     }
 
-    public String listNIGOEvents() {
-        StringBuilder sb = new StringBuilder();
-        for(VoyaNIGOEvent n: this.nigoEvents) {
-            sb.append(n.getText() + ",\n");
-        }
-        return sb.toString();
+    public List<VoyaNIGOEvent> getNigoEvents() {
+        return new ArrayList<>(this.nigoEvents);
     }
 
     public VoyaNIGOEvent getNIGOEvent(int index) throws IndexOutOfBoundsException {
@@ -33,18 +33,36 @@ public class VoyaClaim {
         return this.nigoEvents.size();
     }
 
-    public String getNextNIGOEvent() {
-        try {
-            String out = this.getNIGOEvent(nigoCounter).getText();
+    //TODO: This methods seems a little risky, depending on how the user interface design goes it might be good to remove
+    public VoyaNIGOEvent getNextNIGOEvent() {
+            VoyaNIGOEvent out = this.getNIGOEvent(nigoCounter);
             nigoCounter ++;
             return out;
-        }
-        catch(IndexOutOfBoundsException e) {
-            return "There are no more NIGO events";
-        }
+    }
+
+    public VoyaNIGOEvent peekNextNIGOEvent() {
+        return this.getNIGOEvent(nigoCounter);
     }
 
     public String getText() {
         return this.text;
+    }
+
+    public VoyaClaimType getClaimType() {
+        return claimType;
+    }
+
+    public VoyaClaimState getState() {
+        return this.state;
+    }
+
+    public int getNumFixableNIGOEvents() {
+        int count = 0;
+        for(VoyaNIGOEvent e : this.nigoEvents) {
+            if(e.getFixable()) {
+                count ++;
+            }
+        }
+        return count;
     }
 }
