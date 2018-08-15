@@ -29,6 +29,12 @@ public interface VoyaResponse {
     int getClaimIndex();
 
     /**
+     * return the index of the current NIGO event in the current claim, starts at 0.
+     * @return index of current NIGO event in current claim, starts at 0
+     */
+    int getNIGOIndex();
+
+    /**
      * Returns the speech to be said by the virtual assistant.
      * @return literal words to be said by the virtual assistant, no ssml tags
      */
@@ -36,8 +42,7 @@ public interface VoyaResponse {
 
     /**
      * Returns the text used for a reprompt.
-     * TODO: What if we don't want a reprompt
-     * @return text used for reprompt (this exists in Amazon Alexa, I don't know if it's a thing in Google Home
+     * @return text used for reprompt (this exists in Amazon Alexa, I don't know if it's a thing in Google Home)
      */
     String getReprompt();
 

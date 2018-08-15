@@ -5,17 +5,19 @@ public class VoyaRequestImpl implements VoyaRequest {
     int questionNo;
     int userPIN;
     int claimIndex;
+    int nigoIndex;
     VoyaRequestType requestType;
     String locale;
     VoyaIntentType intentType;
     String nigoResponse;
 
-    public VoyaRequestImpl(int questionNo, int userPIN, int claimIndex, String locale,
+    public VoyaRequestImpl(int questionNo, int userPIN, int claimIndex, int nigoIndex, String locale,
                            VoyaRequestType requestType, VoyaIntentType intentType, String nigoResponse){
         this.questionNo = questionNo;
         this.requestType = requestType;
         this.userPIN = userPIN;
         this.claimIndex = claimIndex;
+        this.nigoIndex = nigoIndex;
         this.locale = locale;
         this.intentType = intentType;
         this.nigoResponse = nigoResponse;
@@ -34,6 +36,11 @@ public class VoyaRequestImpl implements VoyaRequest {
     @Override
     public int getClaimIndex() {
         return this.claimIndex;
+    }
+
+    @Override
+    public int getNIGOIndex() {
+        return this.nigoIndex;
     }
 
     @Override

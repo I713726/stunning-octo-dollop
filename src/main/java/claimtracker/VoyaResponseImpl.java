@@ -11,11 +11,13 @@ public class VoyaResponseImpl implements VoyaResponse {
     String speech;
     String reprompt;
     boolean shouldSessionEnd;
+    int nigoIndex;
 
-    public VoyaResponseImpl(int questionNumber, int userPIN, int claimIndex,
+    public VoyaResponseImpl(int questionNumber, int userPIN, int claimIndex, int nigoIndex,
                             String speech, String reprompt, boolean shouldSessionEnd) {
         this.questionNumber = questionNumber;
         this.claimIndex = claimIndex;
+        this.nigoIndex = nigoIndex;
         this.userPIN = userPIN;
         this.speech = speech;
         this.reprompt = reprompt;
@@ -35,6 +37,11 @@ public class VoyaResponseImpl implements VoyaResponse {
     @Override
     public int getClaimIndex() {
         return this.claimIndex;
+    }
+
+    @Override
+    public int getNIGOIndex() {
+        return this.nigoIndex;
     }
 
     @Override

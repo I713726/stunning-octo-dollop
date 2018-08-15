@@ -23,7 +23,8 @@ public class VoyaControllerImpl implements VoyaController {
         String speech = "";
         String reprompt = "";
         int questionNumber = sessionData.getQuestionNo();
-        int claimIndex = 0;
+        int claimIndex = sessionData.getClaimIndex();
+        int nigoIndex = sessionData.getNIGOIndex();
         int voyaPin = 0;
         String dateOfBirth = "";
         boolean shouldSessionEnd = false;
@@ -51,7 +52,7 @@ public class VoyaControllerImpl implements VoyaController {
                 speech = "OK, have a nice day!";
                 break;
         }
-        return new VoyaResponseImpl(questionNumber, voyaPin, claimIndex, speech, reprompt, shouldSessionEnd);
+        return new VoyaResponseImpl(questionNumber, voyaPin, claimIndex, nigoIndex, speech, reprompt, shouldSessionEnd);
     }
 
     private VoyaResponse handleIntent(VoyaRequest sessionData){
@@ -59,6 +60,7 @@ public class VoyaControllerImpl implements VoyaController {
         String reprompt = "";
         int questionNumber = sessionData.getQuestionNo();
         int claimIndex = sessionData.getClaimIndex();
+        int nigoIndex = sessionData.getNIGOIndex();
         int userPIN = sessionData.getUserPIN();
         boolean shouldSessionEnd = false;
         if(userPIN == 0) {
@@ -72,6 +74,13 @@ public class VoyaControllerImpl implements VoyaController {
             }
         }
         else {
+            if(claimIndex >= this.getData(userPIN).getClaims().size()) {
+                //TODO: Maybe think of a better way to make this flow, but for now just catching to prevent errors.
+                claimIndex = 0;
+            }
+            if(claimIndex != 0 || nigoIndex >= this.getData(userPIN).getNIGOEvents(claimIndex).size()) {
+                nigoIndex = 0;
+            }
             switch (sessionData.getIntent()) {
 
                 case FALLBACK:
@@ -88,7 +97,8 @@ public class VoyaControllerImpl implements VoyaController {
                             shouldSessionEnd = true;
                             break;
                         case 2:
-                            VoyaNIGOEvent event = this.getData(userPIN).getNextNIGOEvent(claimIndex);
+                            nigoIndex ++;
+                            VoyaNIGOEvent event = this.getData(userPIN).getClaim(claimIndex).getNIGOEvent(nigoIndex - 1);
                             speech = "OK, here's the next item. " + event.getText();
                             if(event.getFixable()) {
                                 speech += ". Would you like to respond to this item now?";
@@ -100,7 +110,7 @@ public class VoyaControllerImpl implements VoyaController {
                             shouldSessionEnd = false;
                             break;
                         case 3:
-                            event = this.getData(userPIN).getNextNIGOEvent(claimIndex);
+                            event = this.getData(userPIN).getClaim(claimIndex - 1).getNIGOEvent(nigoIndex);
                             speech = "OK, here's the next item. " + event.getText();
                             if(event.getFixable()) {
                                 speech += ". Would you like to respond to this item now?";
@@ -123,7 +133,9 @@ public class VoyaControllerImpl implements VoyaController {
                             shouldSessionEnd = false;
                             break;
                         case 2:
-                            VoyaNIGOEvent event = this.getData(userPIN).getNextNIGOEvent(claimIndex);
+
+                            VoyaNIGOEvent event = this.getData(userPIN).getClaim(claimIndex - 1).getNIGOEvent(nigoIndex);
+                            nigoIndex ++;
                             speech = "OK, here's the next item. " + event.getText();
                             if(event.getFixable()) {
                                 speech += ". Would you like to respond to this item now?";
@@ -135,8 +147,22 @@ public class VoyaControllerImpl implements VoyaController {
                             shouldSessionEnd = false;
                             break;
                         case 3:
-                            event = this.getData(userPIN).peekNextNIGOEvent(claimIndex);
-                            speech = "OK, " + event.getSteps();
+                            event = this.getData(userPIN).getClaim(claimIndex - 1).getNIGOEvent(nigoIndex);
+                            if(event.getFixable()) {
+                                speech = "OK, " + event.getSteps();
+                            }
+                            else {
+                                nigoIndex ++;
+                                questionNumber = 2;
+                                event = this.getData(userPIN).getClaim(claimIndex - 1).getNIGOEvent(nigoIndex);
+                                speech = "OK, here's the next item. " + event.getText();
+                                if(event.getFixable()) {
+                                    speech += ". Would you like to respond to this item now?";
+                                }
+                                else {
+                                    speech += ". " + event.getSteps();
+                                }
+                            }
                             break;
                     }
                     break;
@@ -183,12 +209,20 @@ public class VoyaControllerImpl implements VoyaController {
                     break;
                 case CHOOSE_CLAIM:
                     userDataObject = this.getData(userPIN);
-                    VoyaClaim claim = userDataObject.getClaim(claimIndex);
-                    speech += claim.getText();
-                    if (claim.getNumNIGOEvents() > 0) {
-                        speech +=
-                                String.format("\n There are %d issues with this claim, %d of which can be resolved now. " +
-                                        "Would you like to hear them?", claim.getNumNIGOEvents(), claim.getNumFixableNIGOEvents());
+                    VoyaClaim claim;
+
+                    if(claimIndex > userDataObject.getClaims().size()) {
+                        speech = "sorry, can you pick one of the ones I listed? there were " +
+                                userDataObject.getClaims().size() + " of them";
+                    }
+                    else {
+                        claim = userDataObject.getClaim(claimIndex - 1);
+                        speech += claim.getText();
+                        if (claim.getNumNIGOEvents() > 0) {
+                            speech +=
+                                    String.format("\n There are %d issues with this claim, %d of which can be resolved now. " +
+                                            "Would you like to hear them?", claim.getNumNIGOEvents(), claim.getNumFixableNIGOEvents());
+                        }
                     }
                     questionNumber = 2;
                     break;
@@ -206,7 +240,7 @@ public class VoyaControllerImpl implements VoyaController {
                     break;
             }
         }
-        return new VoyaResponseImpl(questionNumber, userPIN, claimIndex, speech, reprompt, shouldSessionEnd);
+        return new VoyaResponseImpl(questionNumber, userPIN, claimIndex, nigoIndex, speech, reprompt, shouldSessionEnd);
     }
 
     private VoyaUserDataObject getData(int userPin) {

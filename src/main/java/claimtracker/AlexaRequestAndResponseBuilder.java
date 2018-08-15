@@ -13,6 +13,7 @@ public class AlexaRequestAndResponseBuilder implements VoyaRequestAndResponseBui
         int questionNo = 0;
         int userPIN = 0;
         int claimIndex = 0;
+        int nigoIndex = 0;
         VoyaIntentType intentType;
 
         String locale = jsonObject.getJSONObject("request").getString("locale");
@@ -41,23 +42,22 @@ public class AlexaRequestAndResponseBuilder implements VoyaRequestAndResponseBui
                 userPIN = 0;
             }
         }
-        try {
-            claimIndex = jsonObject.getJSONObject("session").getJSONObject("attributes").getInt("claimIndex");
+        if(intentType == VoyaIntentType.CHOOSE_CLAIM){
+              try {
+                  claimIndex = jsonObject.getJSONObject("request").getJSONObject("intent").getJSONObject("slots")
+                          .getJSONObject("claimIndex").getJSONObject("resolutions").getJSONArray("resolutionsPerAuthority")
+                          .getJSONObject(0).getJSONArray("values").getJSONObject(0).getJSONObject("value").getInt("name");
+              } catch (JSONException e1) {
+                  throw new IllegalArgumentException("Couldn't find the claim index in a choose claim request");
+              }
         }
-        catch (JSONException e) {
-            if(intentType == VoyaIntentType.CHOOSE_CLAIM){
-                try {
-                    claimIndex = jsonObject.getJSONObject("request").getJSONObject("intent").getJSONObject("slots")
-                            .getJSONObject("claimIndex").getJSONObject("resolutions").getJSONArray("resolutionsPerAuthority")
-                            .getJSONObject(0).getJSONArray("values").getJSONObject(0).getJSONObject("value").getInt("name");
-                } catch (JSONException e1) {
-                    claimIndex = 0;
-                }
+        else {
+            try{
+               claimIndex = jsonObject.getJSONObject("session").getJSONObject("attributes").getInt("claimIndex");
             }
-            else {
+            catch(JSONException e) {
                 claimIndex = 0;
             }
-
         }
         if(requestType == VoyaRequestType.INTENT_REQUEST) {
             if(intentType == VoyaIntentType.PIN) {
@@ -67,9 +67,15 @@ public class AlexaRequestAndResponseBuilder implements VoyaRequestAndResponseBui
                 //TODO: Handle the choosing of a claim in whatever way seems to make sense
             }
         }
+        try {
+            nigoIndex = jsonObject.getJSONObject("session").getJSONObject("attributes").getInt("nigoIndex");
+        }
+        catch(JSONException e) {
+            nigoIndex = 0;
+        }
 
 
-        return new VoyaRequestImpl(questionNo, userPIN, claimIndex, locale, requestType, intentType, "");
+        return new VoyaRequestImpl(questionNo, userPIN, claimIndex, nigoIndex, locale, requestType, intentType, "");
     }
 
     @Override
@@ -88,7 +94,8 @@ public class AlexaRequestAndResponseBuilder implements VoyaRequestAndResponseBui
                 */
         outJson.getJSONObject("response").put("shouldEndSession", response.getShouldSessionEnd());
         outJson.put("sessionAttributes", new JSONObject().put("questionNo", response.getQuestionNumber())
-                .put("voyaPIN", response.getUserPIN()).put("claimIndex", response.getClaimIndex()));
+                .put("voyaPIN", response.getUserPIN()).put("claimIndex", response.getClaimIndex())
+                .put("nigoIndex", response.getNIGOIndex()));
         return outJson.toString();
     }
 

@@ -32,17 +32,6 @@ public class UserDataObjectImpl implements VoyaUserDataObject {
     }
 
     @Override
-    public VoyaNIGOEvent getNextNIGOEvent(int claimIndex) {
-        //TODO: Still figuring out how to handle this
-        return claims.get(claimIndex).getNextNIGOEvent();
-    }
-
-    @Override
-    public VoyaNIGOEvent peekNextNIGOEvent(int claimIndex) {
-        return claims.get(claimIndex).peekNextNIGOEvent();
-    }
-
-    @Override
     public List<VoyaNIGOEvent> getNIGOEvents(int claimIndex) {
         return claims.get(claimIndex).getNigoEvents();
     }

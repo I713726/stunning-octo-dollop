@@ -33,17 +33,6 @@ public class VoyaClaim {
         return this.nigoEvents.size();
     }
 
-    //TODO: This methods seems a little risky, depending on how the user interface design goes it might be good to remove
-    public VoyaNIGOEvent getNextNIGOEvent() {
-            VoyaNIGOEvent out = this.getNIGOEvent(nigoCounter);
-            nigoCounter ++;
-            return out;
-    }
-
-    public VoyaNIGOEvent peekNextNIGOEvent() {
-        return this.getNIGOEvent(nigoCounter);
-    }
-
     public String getText() {
         return this.text;
     }

@@ -19,10 +19,16 @@ public interface VoyaRequest {
 
     /**
      * Once the user has chosen a claim to review, it will return the index of the claim they chose in their list of claims.
-     * If the user has not chosen yet it will be zero.
-     * @return
+     * If the user has not chosen yet it will be zero. One is the first valid claim index.
+     * @return the index of the claim, starting at 1 for actual indicies and 0 for uninitialized
      */
     int getClaimIndex();
+
+    /**
+     * The NIGO Index keeps track of how far we are into the current claim's list of NIGO events, starts at 0.
+     * @return the index into the current claim's NIGO events, starting at 0
+     */
+    int getNIGOIndex();
 
     /**
      * Returns the type of request

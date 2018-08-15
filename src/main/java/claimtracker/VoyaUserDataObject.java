@@ -12,10 +12,6 @@ public interface VoyaUserDataObject {
 
     String getLastName();
 
-    VoyaNIGOEvent getNextNIGOEvent(int claimIndex);
-
-    VoyaNIGOEvent peekNextNIGOEvent(int claimIndex);
-
     List<VoyaNIGOEvent> getNIGOEvents(int claimIndex);
 
     void respondToCurrentNIGOEvent(int claimIndex, String response);
