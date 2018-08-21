@@ -47,6 +47,12 @@ public interface VoyaResponse {
     String getReprompt();
 
     /**
+     * returns the text of a NIGO response, this is stored as a session variable until it is confirmed by the user.
+     * @return
+     */
+    String getNIGOResponse();
+
+    /**
      * Returns the boolean that says whether the session ends. If true, this response ends the session, if false the
      * session continues.
      * @return the boolean that says whether the session ends now.

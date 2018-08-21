@@ -15,6 +15,7 @@ public class AlexaRequestAndResponseBuilder implements VoyaRequestAndResponseBui
         int claimIndex = 0;
         int nigoIndex = 0;
         VoyaIntentType intentType;
+        String nigoResponse = "";
 
         String locale = jsonObject.getJSONObject("request").getString("locale");
         VoyaRequestType requestType = this.getRequestType(jsonObject.getJSONObject("request").getString("type"));
@@ -59,13 +60,8 @@ public class AlexaRequestAndResponseBuilder implements VoyaRequestAndResponseBui
                 claimIndex = 0;
             }
         }
-        if(requestType == VoyaRequestType.INTENT_REQUEST) {
-            if(intentType == VoyaIntentType.PIN) {
-                userPIN = jsonObject.getJSONObject("request").getJSONObject("intent").getJSONObject("slots").getJSONObject("voyaPIN").getInt("value");
-            }
-            else if(intentType == VoyaIntentType.CHOOSE_CLAIM) {
-                //TODO: Handle the choosing of a claim in whatever way seems to make sense
-            }
+        if(intentType == VoyaIntentType.PIN) {
+            userPIN = jsonObject.getJSONObject("request").getJSONObject("intent").getJSONObject("slots").getJSONObject("voyaPIN").getInt("value");
         }
         try {
             nigoIndex = jsonObject.getJSONObject("session").getJSONObject("attributes").getInt("nigoIndex");
@@ -73,9 +69,32 @@ public class AlexaRequestAndResponseBuilder implements VoyaRequestAndResponseBui
         catch(JSONException e) {
             nigoIndex = 0;
         }
-
-
-        return new VoyaRequestImpl(questionNo, userPIN, claimIndex, nigoIndex, locale, requestType, intentType, "");
+        if(intentType == VoyaIntentType.NIGO_RESPONSE) {
+            JSONObject fullfillmentSlot = jsonObject.getJSONObject("request").getJSONObject("intent").getJSONObject("slots");
+            if(fullfillmentSlot.getJSONObject("date").has("value")) {
+                nigoResponse = fullfillmentSlot.getJSONObject("date").getString("value");
+            }
+            else if(fullfillmentSlot.getJSONObject("phone_number").has("value")) {
+                nigoResponse = fullfillmentSlot.getJSONObject("phone_number").getString("value");
+            }
+            else if(fullfillmentSlot.getJSONObject("address").has("value")) {
+                nigoResponse = fullfillmentSlot.getJSONObject("address").getString("value");
+            }
+            else if(fullfillmentSlot.getJSONObject("number").has("value")) {
+                nigoResponse = fullfillmentSlot.getJSONObject("number").getString("value");
+            }
+            else {
+                throw new IllegalArgumentException("Unknown type of value for NIGO response.");
+            }
+        }
+        else {
+            try {
+                nigoResponse = jsonObject.getJSONObject("session").getJSONObject("attributes").getString("nigoResponse");
+            }catch (JSONException e) {
+                nigoResponse = "";
+            }
+        }
+        return new VoyaRequestImpl(questionNo, userPIN, claimIndex, nigoIndex, locale, requestType, intentType, nigoResponse);
     }
 
     @Override
@@ -95,7 +114,7 @@ public class AlexaRequestAndResponseBuilder implements VoyaRequestAndResponseBui
         outJson.getJSONObject("response").put("shouldEndSession", response.getShouldSessionEnd());
         outJson.put("sessionAttributes", new JSONObject().put("questionNo", response.getQuestionNumber())
                 .put("voyaPIN", response.getUserPIN()).put("claimIndex", response.getClaimIndex())
-                .put("nigoIndex", response.getNIGOIndex()));
+                .put("nigoIndex", response.getNIGOIndex()).put("nigoResponse", response.getNIGOResponse()));
         return outJson.toString();
     }
 
@@ -123,7 +142,7 @@ public class AlexaRequestAndResponseBuilder implements VoyaRequestAndResponseBui
                 return VoyaIntentType.YES;
             case "VoyaNoIntent":
                 return VoyaIntentType.NO;
-            case "VoyaNIGOResponse":
+            case "VoyaNIGOFullfillmentIntent":
                 return VoyaIntentType.NIGO_RESPONSE;
             case "AMAZON.FallbackIntent":
                 return VoyaIntentType.FALLBACK;
