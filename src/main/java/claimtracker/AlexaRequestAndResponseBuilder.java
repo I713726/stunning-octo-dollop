@@ -4,6 +4,10 @@ import com.fasterxml.jackson.core.io.JsonStringEncoder;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+/**
+ * This class is an implementation of the VoyaRequestAndResponseBuilder that processes and creates JSON in the format
+ * supported by Amazon Alexa.
+ */
 public class AlexaRequestAndResponseBuilder implements VoyaRequestAndResponseBuilder{
 
 

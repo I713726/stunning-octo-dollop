@@ -1,8 +1,9 @@
 package claimtracker;
 
 /**
- * This interface represents the response sent from the web application to the virtual assistant. How this is constructed
- * into JSON is another class's responsibility
+ * This interface represents the response sent from the web application to the virtual assistant. A class that
+ * implements the VoyaRequestAndResponseBuilder will take the information from this class to build a JSON response
+ * for the virtual assistant.
  */
 public interface VoyaResponse {
 

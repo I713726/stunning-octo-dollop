@@ -1,4 +1,7 @@
 package claimtracker;
+/**
+ * This is a class representing an EB claim, that allows you to retrieve all the information about the claim.
+ */
 
 import java.util.ArrayList;
 import java.util.List;

@@ -1,5 +1,10 @@
 package claimtracker;
 
+/**
+ * This interface is the layer of translation between the JSON recieved and sent to the virtual assistant and the
+ * VoyaRequest and VoyaResponse classes used to process the dialog interally.
+ */
+
 public interface VoyaRequestAndResponseBuilder {
 
     /**

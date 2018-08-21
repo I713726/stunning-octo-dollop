@@ -330,7 +330,8 @@ public class VoyaControllerImpl implements VoyaController {
                         if (claim.getNumNIGOEvents() > 0) {
                             speech +=
                                     String.format("\n There are %d issues with this claim, %d of which can be resolved now. " +
-                                            "Would you like to hear them?", claim.getNumNIGOEvents(), claim.getNumFixableNIGOEvents());
+                                            "Would you like to hear them?", claim.getNumNIGOEvents(),
+                                            claim.getNumFixableNIGOEvents());
                             questionNumber = 2;
                         }
                         else {

@@ -1,5 +1,10 @@
 package claimtracker;
 
+/**
+ * This class represents a request sent to the skill, with set of information about the requeset that can be retrieved
+ * with the methods described in this class.
+ */
+
 public interface VoyaRequest {
     /**
      * returns the question number, used for tracking where the user is in the flow of interaction.

@@ -1,5 +1,8 @@
 package claimtracker;
 
+/**
+ * This class represents a Not in Good Order (NIGO) event that needs addressing
+ */
 
 public class VoyaNIGOEvent {
     private boolean fixable;
