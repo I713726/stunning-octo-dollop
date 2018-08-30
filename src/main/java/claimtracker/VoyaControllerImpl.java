@@ -165,8 +165,8 @@ public class VoyaControllerImpl implements VoyaController {
                             event = this.getData(userPIN).getClaim(claimIndex - 1).getNIGOEvent(nigoIndex);
                             if(event.getFixable()) {
                                 switch(event.getFulfillmentType()) {
-                                    case LONG_NUMBER:
-                                        type = "number";
+                                    case PHONE_NUMBER:
+                                        type = "phone number";
                                         break;
                                     case NUMBER:
                                         type = "number";
@@ -407,7 +407,7 @@ public class VoyaControllerImpl implements VoyaController {
 
         claim1.addNIGOEvent(new VoyaNIGOEvent(true, NIGO_Fulfillment_Type.DATE,"There was a date missing", "Provide the date"));
         claim1.addNIGOEvent(new VoyaNIGOEvent(false, null, "need a document", "Please send it to us with mail."));
-        claim1.addNIGOEvent(new VoyaNIGOEvent(true, NIGO_Fulfillment_Type.ADDRESS, "We need an address", "Provide the address"));
+        claim1.addNIGOEvent(new VoyaNIGOEvent(true, NIGO_Fulfillment_Type.PHONE_NUMBER, "We need a phone number", "Provide the phone number"));
         UserDataObjectImpl retObj = new UserDataObjectImpl();
         retObj.addClaim(claim1);
         retObj.addClaim(claim2);
