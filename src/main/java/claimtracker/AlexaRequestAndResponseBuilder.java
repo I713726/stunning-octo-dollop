@@ -65,7 +65,12 @@ public class AlexaRequestAndResponseBuilder implements VoyaRequestAndResponseBui
             }
         }
         if(intentType == VoyaIntentType.PIN) {
-            userPIN = jsonObject.getJSONObject("request").getJSONObject("intent").getJSONObject("slots").getJSONObject("voyaPIN").getInt("value");
+            try{
+                userPIN = jsonObject.getJSONObject("request").getJSONObject("intent").getJSONObject("slots").getJSONObject("voyaPIN").getInt("value");
+            }
+            catch(Exception e) {
+                userPIN = 0;
+            }
         }
         try {
             nigoIndex = jsonObject.getJSONObject("session").getJSONObject("attributes").getInt("nigoIndex");
