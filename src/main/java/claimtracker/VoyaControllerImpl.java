@@ -210,10 +210,10 @@ public class VoyaControllerImpl implements VoyaController {
                             break;
                         case 5:
                             VoyaUserDataObject userDataObject = this.getData(userPIN);
-                            speech = "OK, thanks for your response.";
+                            speech = "OK, thanks for your response. ";
                             nigoIndex ++;
                             if(claimIndex == 0 || nigoIndex >= userDataObject.getNIGOEvents(claimIndex - 1).size()) {
-                                speech += "That's everything for this claim. Thanks for helping resolve those issues." +
+                                speech += "That's everything for this claim. Thanks for helping resolve those issues. " +
                                         "Would you like to check the status of another claim?";
                                 questionNumber = 6;
                                 nigoIndex = 0;
@@ -344,7 +344,7 @@ public class VoyaControllerImpl implements VoyaController {
                 case NIGO_RESPONSE:
                     if(questionNumber == 4) {
                         userDataObject = this.getData(userPIN);
-                        speech = "OK, just cofirming, the response you gave is " + sessionData.getNIGOResponse() +", right?";
+                        speech = "OK, just confirming, the response you gave is " + sessionData.getNIGOResponse() +", right?";
                         questionNumber = 5;
                     }
                     else {
@@ -406,7 +406,7 @@ public class VoyaControllerImpl implements VoyaController {
                 " been sent by check on 08/13/2018. Please allow 7-10 business days for mailing time.", VoyaClaimType.ACCIDENT, VoyaClaimState.PAID);
 
         claim1.addNIGOEvent(new VoyaNIGOEvent(true, NIGO_Fulfillment_Type.DATE,"There was a date missing", "Provide the date"));
-        claim1.addNIGOEvent(new VoyaNIGOEvent(false, null, "need a document", "Please submit the thing the way you're supposed to"));
+        claim1.addNIGOEvent(new VoyaNIGOEvent(false, null, "need a document", "Please send it to us with mail."));
         claim1.addNIGOEvent(new VoyaNIGOEvent(true, NIGO_Fulfillment_Type.ADDRESS, "We need an address", "Provide the address"));
         UserDataObjectImpl retObj = new UserDataObjectImpl();
         retObj.addClaim(claim1);
